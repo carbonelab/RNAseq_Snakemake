@@ -1,0 +1,37 @@
+# Config File
+
+gtf_file:
+  /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly/annotation/Homo_sapiens.GRCh38.103.gtf
+
+star:
+  /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly/star2
+
+gene_info_file:
+  /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly/annotation/GRCh38.103.gene_info.txt
+
+organism:
+  homo sapiens
+
+ref_genome:
+  GRCh38.103
+
+bismark_ref_genome:
+  /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly
+
+comparisons: ['ControlPre_V_ControlPost','PatientPre_V_PatientPost','PatientPre_V_ControlPre','PatientPost_V_ControlPost']
+
+################################
+
+#      IDE Configuration       #
+
+################################
+
+minimum_coverage:
+  10
+
+header_present:
+  FALSE
+
+processors:
+  8
+
