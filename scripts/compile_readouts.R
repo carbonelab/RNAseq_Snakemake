@@ -38,10 +38,10 @@ if (is.null(opt$strand)){
   print_help(opt_parser)
   stop("Missing strand column.n", call.=FALSE)
 }
-if (is.null(opt$metadata)){
-  print_help(opt_parser)
-  stop("Missing metadata file.n", call.=FALSE)
-}
+#if (is.null(opt$metadata)){
+#  print_help(opt_parser)
+#  stop("Missing metadata file.n", call.=FALSE)
+#}
 
 # create a list that contains the path to all input files
 counts_list <- list.files(opt$directory, 'ReadsPerGene.out.tab$', full=T)
@@ -52,14 +52,16 @@ names(counts_list) <- gsub("/", '',names(counts_list))
 
 # replace the current names (the fastq prefix) with desired sample names from metadata excel file
 # read in the metadata excel file
-my_meta <- as.data.frame(read_excel(opt$metadata))
-colnames(my_meta)[1] <- "sample"
+#my_meta <- as.data.frame(read_excel(opt$metadata))
+#colnames(my_meta)[1] <- "sample"
 # create vector of sample names from matching fastq with sample in metadata file
-my_samples <- as.character(sapply(names(counts_list), function(x) my_meta[my_meta$fastq == x, "sample"]))
-names(counts_list) <- my_samples
+#my_samples <- as.character(sapply(names(counts_list), function(x) my_meta[my_meta$fastq == x, "sample"])
+
+#names(counts_list) <- my_meta$sample
 
 # read in each counts file as a data frame and store in a list of df's
 counts_dfs <- mclapply(counts_list, function(x) read.table(x), mc.cores=8)
+
 
 # convert the correct counts column to numeric
 for (i in 1:length(counts_dfs)) {counts_dfs[[i]][,opt$strand] <- as.numeric(counts_dfs[[i]][,opt$strand])}
@@ -87,7 +89,7 @@ my_table <- Reduce(function(df1, df2) merge(df1, df2, by = "GeneID", all = TRUE)
 #my_meta$sample <- gsub("-", ".", my_meta$sample)
 rownames(my_table) <- my_table[ ,1]
 my_table[ ,1] <- NULL
-my_table2 <- my_table[ ,match(my_meta$sample, colnames(my_table))]
+my_table2 <- my_table[ ,match(names(counts_list), colnames(my_table))]
 my_table2$GeneID <- rownames(my_table2)
 my_table2 <- my_table2[ ,c(ncol(my_table2),1:ncol(my_table2)-1)]
 

@@ -20,17 +20,17 @@ library(stringr)
 # LOAD CUSTOM FUNCTIONS
 
 #source("/home/groups/hoolock2/u0/bd/Projects/agarwal/bulk_RNAseq_pipeline/rmarkdown/bulkRNA_source_functions.R")
-source("/home/groups/hoolock2/u0/bd/scripts_2020/RNAseq/initial_data_exploration/bulkRNA_ide_source_functions.R")
+source("scripts/bulkRNA_ide_source_functions.R")
 
 #------------------------------------------------------#
 
 # USER VARIABLES
 
-raw_counts_tbl <- "../data/counts/raw_counts.txt"
-my_metadata <- "../metadata/rnaseq_metadata.xlsx"
+raw_counts_tbl <- "data/counts_table.txt"
+my_metadata <- "data/metadata.xlsx"
 gene_info <- "/home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly/annotation/GRCh38.103.gene_info.txt"
 plot_type <- "pdf"
-outfile_prefix <- "../data/ide/" # run from scripts dir, set relative path for outfiles
+outfile_prefix <- "data/ide/" # run from scripts dir, set relative path for outfiles
 
 #------------------------------------------------------#
 
@@ -46,7 +46,7 @@ raw_counts[,1] <- NULL
 coldata <- as.data.frame(read_xlsx(my_metadata))
 
 # read in reference table that matches geneID to gene name
-ref <- read.delim(gene_info, header=TRUE)
+ref <- read.delim(grene_info, header=TRUE)
 # change colnames
 colnames(ref) <- c("GeneID","gene.name","gene.type","gene.description")
 # remove any duplicate GeneID rows
@@ -114,7 +114,7 @@ mypca <- perform_manual_pca(vsd = vsd, n=nrow(counts.keep))
 
 # add new column to coldata for rep
 coldata$rep <- str_sub(coldata$Sample_Name, -1)
-coldata$seq_run <- as.character(coldata$seq_run)
+#coldata$seq_run <- as.character(coldata$seq_run)
 
 # produce PCA biplots
 myplot <- plot_pca(mypca = mypca,

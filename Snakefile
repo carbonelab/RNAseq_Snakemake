@@ -94,3 +94,16 @@ rule star:
         gtf = config["gtf_file"]
     shell:
         "STAR --runThreadN 8 --genomeDir {params.starDir} --readFilesIn {input.fwd} {input.rev} --readFilesCommand zcat --sjdbGTFfile {params.gtf} --outFileNamePrefix {params.outdir} --outSAMstrandField intronMotif --outSAMtype BAM SortedByCoordinate --outFilterIntronMotifs RemoveNoncanonicalUnannotated --quantMode GeneCounts --twopassMode Basic --outReadsUnmapped Fastx"
+
+
+rule compile_counts:
+    input:
+        "data/star/{sample}.star.ReadsPerGene.out.tab"
+    output:
+        "data/counts_table.txt"
+    params:
+        outdir = "data/counts_table.txt",
+        indir = "data/star",
+        inColumn = "4",
+    shell:
+        "Rscript scripts/compile_readouts.R -s {params.inColumn} -d {params.inDir} -o {params.outDir}"
