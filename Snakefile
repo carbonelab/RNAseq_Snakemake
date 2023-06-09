@@ -1,8 +1,7 @@
-# Snakefile to analyze RRBS PE data
+# Snakefile to analyze RNAseq data
 # 
 
 configfile:"proj_config.yaml"
-#project_id = config["project_id"]
 
 
 SAMPLES, = glob_wildcards("data/fastq/{sample}_R1.fastq.gz")
