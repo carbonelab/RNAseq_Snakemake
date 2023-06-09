@@ -107,3 +107,13 @@ rule compile_counts:
         inColumn = "4",
     shell:
         "Rscript scripts/compile_readouts.R -s {params.inColumn} -d {params.inDir} -o {params.outDir}"
+
+rule ide:
+    input:
+        "data/counts_table.txt"
+    output:
+        "data/ide/filtered_counts.txt"
+    params:
+        gene_info_file = config["gene_info_file"]
+    shell:
+        "Rscript scripts/run_IDE.R {params.gene_info_file}"

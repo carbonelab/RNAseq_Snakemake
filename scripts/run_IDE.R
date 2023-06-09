@@ -21,14 +21,15 @@ library(stringr)
 
 #source("/home/groups/hoolock2/u0/bd/Projects/agarwal/bulk_RNAseq_pipeline/rmarkdown/bulkRNA_source_functions.R")
 source("scripts/bulkRNA_ide_source_functions.R")
+source("scripts/helperFunctions.R")
 
 #------------------------------------------------------#
 
 # USER VARIABLES
 
 raw_counts_tbl <- "data/counts_table.txt"
-my_metadata <- "data/metadata.xlsx"
-gene_info <- "/home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly/annotation/GRCh38.103.gene_info.txt"
+my_metadata <- "data/samples.info"
+gene_info <- args[1]
 plot_type <- "pdf"
 outfile_prefix <- "data/ide/" # run from scripts dir, set relative path for outfiles
 
@@ -43,10 +44,10 @@ rownames(raw_counts) <- raw_counts[,1]
 raw_counts[,1] <- NULL
 
 # read in metadata excel file
-coldata <- as.data.frame(read_xlsx(my_metadata))
+coldata <- as.data.frame(checkSamples())
 
 # read in reference table that matches geneID to gene name
-ref <- read.delim(grene_info, header=TRUE)
+ref <- read.delim(gene_info, header=TRUE)
 # change colnames
 colnames(ref) <- c("GeneID","gene.name","gene.type","gene.description")
 # remove any duplicate GeneID rows
@@ -113,7 +114,7 @@ ggsave(filename=paste0(outfile_prefix, "pca_pc1_pc2.", plot_type), plot=myplot)
 mypca <- perform_manual_pca(vsd = vsd, n=nrow(counts.keep))
 
 # add new column to coldata for rep
-coldata$rep <- str_sub(coldata$Sample_Name, -1)
+coldata$rep <- coldata$Sample_Name
 #coldata$seq_run <- as.character(coldata$seq_run)
 
 # produce PCA biplots
@@ -129,7 +130,7 @@ myplot <- plot_pca(mypca = mypca,
   coldata = coldata,
   pc_a = "PC1",
   pc_b = "PC2",
-  color_var = "seq_run",
+  color_var = "Group",
   label_var = "rep")
 ggsave(filename=paste0(outfile_prefix, "pca_biplot.pc1_pc2.color_seq.", plot_type), plot=myplot)
 
@@ -146,6 +147,6 @@ myplot <- plot_pca(mypca = mypca,
   coldata = coldata,
   pc_a = "PC1",
   pc_b = "PC3",
-  color_var = "seq_run",
+  color_var = "Group",
   label_var = "rep")
 ggsave(filename=paste0(outfile_prefix, "pca_biplot.pc1_pc3.color_seq.", plot_type), plot=myplot)

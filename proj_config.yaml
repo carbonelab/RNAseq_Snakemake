@@ -18,8 +18,6 @@ ref_genome:
 bismark_ref_genome:
   /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly
 
-comparisons: ['ControlPre_V_ControlPost','PatientPre_V_PatientPost','PatientPre_V_ControlPre','PatientPost_V_ControlPost']
-
 ################################
 
 #      IDE Configuration       #
