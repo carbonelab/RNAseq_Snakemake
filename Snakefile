@@ -15,7 +15,9 @@ rule all:
         expand("data/trimming/unpaired/out_unpaired_{dir}_{sample}.fastq.gz", sample = SAMPLES, dir = ["R1", "R2"]),
         expand("data/fastqc/trim/out_paired_{dir}_{sample}_fastqc.zip", sample = SAMPLES, dir = ["R1", "R2"]),
         expand("data/fastqc/trim/multiqc_report.html"),
-        expand("data/star/{sample}.star.Log.out", sample = SAMPLES)
+        expand("data/star/{sample}.star.ReadsPerGene.out.tab", sample = SAMPLES),
+        "data/counts_table.txt",
+        "data/ide/filtered_counts.txt"
 
 rule fastqc_raw:
     input:
@@ -87,7 +89,7 @@ rule star:
         fwd = "data/trimming/out_paired_R1_{sample}.fastq.gz",
         rev = "data/trimming/out_paired_R2_{sample}.fastq.gz"
     output:
-        "data/star/{sample}.star.Log.out"
+        "data/star/{sample}..star.ReadsPerGene.out.tab"
     params:
         outdir = "data/star/{sample}.star.",
         starDir = config["star"],
