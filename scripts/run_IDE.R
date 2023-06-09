@@ -19,7 +19,6 @@ library(stringr)
 
 # LOAD CUSTOM FUNCTIONS
 
-#source("/home/groups/hoolock2/u0/bd/Projects/agarwal/bulk_RNAseq_pipeline/rmarkdown/bulkRNA_source_functions.R")
 source("scripts/bulkRNA_ide_source_functions.R")
 source("scripts/helperFunctions.R")
 

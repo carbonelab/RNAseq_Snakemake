@@ -2,13 +2,12 @@
 
 # Functions for data exploration of bulk RNAseq data
 # 1. clean_gene_info: read in a gene info file and produce clean colnames, remove dups
-# 2. compile_readcounts: create counts table from directory of STAR ReadsPerGene.tab files
-# 3. plot_total_counts: create barplot of total raw counts per sample
-# 4. plot_top_count_genes: create barplot of top n gene by average count across all samples
-# 5. lcf_edger: low count filter via edgeR method
-# 6. var_stable_transform: perform variance stabilizing transformation of counts for visualization
-# 7. sample_dist_heatmap: plot a Euclidean distance sample correlation heatmap
-# 8. deseq2_pca: plot a simple PCA biplot of PC1 vs PC2 via DESeq2's plotPCA function
+# 2. plot_total_counts: create barplot of total raw counts per sample
+# 3. plot_top_count_genes: create barplot of top n gene by average count across all samples
+# 4. lcf_edger: low count filter via edgeR method
+# 5. var_stable_transform: perform variance stabilizing transformation of counts for visualization
+# 6. sample_dist_heatmap: plot a Euclidean distance sample correlation heatmap
+# 7. deseq2_pca: plot a simple PCA biplot of PC1 vs PC2 via DESeq2's plotPCA function
 
 #----------------------------------------------------------------------------------------------------#
 
@@ -59,75 +58,6 @@ clean_gene_info <- function(gene_info, gene_id_col="GeneID", gene_name_col="gene
 
   return(ref)
 }
-
-#-----------------------------------------------------------------------------------------------#
-
-############--------------------------------------------#
-# FUNCTION # compile_readcounts: to create counts table #
-############--------------------------------------------#
-# INPUTS: dir: path to directory containing STAR ReadsPerGene.out.tab files
-#         strand: number signifying which column of counts to keep
-#         metadat: path to metadata excel file, first column is Sample_Name
-#         outfile: name of output counts table text file
-#         suffix: ending of ReadsPerGene files to grab (and to remove)
-# OUTPUTS: 1. a raw counts table tab-separated text file
-#          2. returns a raw counts data.frame object
-compile_readcounts <- function(dir, strand, metadat, outfile="raw_counts.txt", suffix=".star.ReadsPerGene.out.tab") {
-  # create a list that contains the path to all input files
-  counts_list <- list.files(dir, paste0(suffix, "$"), full=T)
-  names(counts_list) <- counts_list
-  names(counts_list) <- gsub(suffix,'',names(counts_list))
-  names(counts_list) <- gsub(dir, '',names(counts_list))
-  names(counts_list) <- gsub("/", '',names(counts_list))
-
-  # replace the current names (the fastq prefix) with desired sample names from metadata excel file
-  # read in the metadata excel file
-  my_meta <- as.data.frame(read_excel(metadat))
-  colnames(my_meta)[1] <- "sample"
-  # create vector of sample names from matching fastq with sample in metadata file
-  my_samples <- as.character(sapply(names(counts_list), function(x) my_meta[my_meta$fastq == x, "sample"]))
-  names(counts_list) <- my_samples
-
-  # read in each counts file as a data frame and store in a list of df's
-  counts_dfs <- mclapply(counts_list, function(x) read.table(x), mc.cores=8)
-
-  # convert the correct counts column to numeric
-  for (i in 1:length(counts_dfs)) {counts_dfs[[i]][,strand] <- as.numeric(counts_dfs[[i]][,strand])}
-
-  # change the name of the correct column to be the sample name
-  for (i in 1:length(counts_dfs)) {colnames(counts_dfs[[i]])[strand] <- names(counts_dfs)[i]}
-
-  # change the name of column 1 to "GeneID"
-  for (i in 1:length(counts_dfs)) {colnames(counts_dfs[[i]])[1] <- "GeneID"}
-
-  # drop unnecessary counts columns
-  for (i in 1:length(counts_dfs)) {counts_dfs[[i]] <- subset(counts_dfs[[i]], select = colnames(counts_dfs[[i]][c(1,strand)]))}
-
-  # remove rows 1,2,3,4
-  for (i in 1:length(counts_dfs)) {counts_dfs[[i]] <- counts_dfs[[i]][-c(1,2,3,4), ]}
-
-  # merge all data frames on "GeneID"
-  my_table <- Reduce(function(df1, df2) merge(df1, df2, by = "GeneID", all = TRUE), counts_dfs)
-
-  # The order of the sample columns in the counts table is currently in the order of the
-  #  ReadPerGene files from the star directory
-  # rearrange sample columns of raw counts table to be in same order as rows of metadata table
-  # if the desired sample names in metadata table have dashes, they will have been replaced in colnames of raw counts table as periods
-  # replace the dashes with periods in the first column of metadata table
-  #my_meta$sample <- gsub("-", ".", my_meta$sample)
-  rownames(my_table) <- my_table[ ,1]
-  my_table[ ,1] <- NULL
-  my_table2 <- my_table[ ,match(my_meta$sample, colnames(my_table))]
-  my_table2$GeneID <- rownames(my_table2)
-  my_table2 <- my_table2[ ,c(ncol(my_table2),1:ncol(my_table2)-1)]
-
-  # export the final table
-  write.table(my_table2, outfile, col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
-
-  return(my_table2)
-}
-
-#----------------------------------------------------------------------------------------------#
 
 ############------------------------------------------------------------------#
 # FUNCTION # plot_total_counts: create barplot of total raw counts per sample #
