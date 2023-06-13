@@ -54,12 +54,13 @@ rule trimmomatic:
         unpaired_R1 = "data/trimming/unpaired/out_unpaired_R1_{sample}.fastq.gz",
         paired_R2 = "data/trimming/out_paired_R2_{sample}.fastq.gz",
         unpaired_R2 = "data/trimming/unpaired/out_unpaired_R2_{sample}.fastq.gz",
+        adapters = "ILLUMINACLIP:/home/groups/hoolock2/u0/bd/bin/miniconda3/envs/RNAseq/share/trimmomatic-0.39-1/adapters/TruSeq3-PE-2.fa:2:30:10:8:true",
         leading = "LEADING:3",
         trailing = "TRAILING:3",
         sldWindow = "SLIDINGWINDOW:4:15",
         minLen = "MINLEN:36"
     shell:
-        "trimmomatic PE -phred33 {input.fwd} {input.rev} {params.paired_R1} {params.unpaired_R1} {params.paired_R2} {params.unpaired_R2} {params.leading} {params.trailing} {params.sldWindow} {params.minLen}"
+        "trimmomatic PE -phred33 {input.fwd} {input.rev} {params.paired_R1} {params.unpaired_R1} {params.paired_R2} {params.unpaired_R2} {params.adapters} {params.leading} {params.trailing} {params.sldWindow} {params.minLen}"
 
 rule fastqc_trim:
     input:
